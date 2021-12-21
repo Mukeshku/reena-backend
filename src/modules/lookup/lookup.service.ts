@@ -2,11 +2,11 @@ import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
 
-import {LookUp} from './lookup.model';
+import {look_up_points} from './lookup.model';
 
 @Injectable()
 export class LookUpService {
-    constructor(@InjectModel('LookUp') private readonly lookUpModel: Model<LookUp>) {
+    constructor(@InjectModel('look_up_points') private readonly lookUpModel: Model<look_up_points>) {
     }
 
     /*  async insertProduct(title: string, desc: string, price: number) {
@@ -62,7 +62,7 @@ export class LookUpService {
 
        */
 
-     async getAll(): Promise<LookUp> {
+     async getAll(): Promise<look_up_points> {
         let data;
         try {
             data = await this.lookUpModel.find({})
@@ -76,7 +76,7 @@ export class LookUpService {
     }
 
     async findProductByData(tierId: string, brandId: string, multiplier: Number): Promise<string> {
-        let product: LookUp;
+        let product: look_up_points;
         try {
             product = await this.lookUpModel.findOneAndUpdate(
                 {tierId, brandId, multiplier},

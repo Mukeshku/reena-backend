@@ -8,7 +8,7 @@ export const LookUpSchema = new Schema({
     multiplier: {type: mongoose.Types.Double}
 }, {timestamps: true, versionKey: false});
 
-export interface LookUp {
+export interface look_up_points {
     _id: string;
     brandId: string;
     multiplier: number;

@@ -6,7 +6,7 @@ import { LookUpService } from './lookup.service';
 import { LookUpSchema } from './lookup.model';
 
 @Module({
-    imports: [MongooseModule.forFeature([{ name: 'LookUp', schema: LookUpSchema }])],
+    imports: [MongooseModule.forFeature([{ name: 'look_up_points', schema: LookUpSchema }])],
     controllers: [LookupController],
     providers: [LookUpService],
 })
