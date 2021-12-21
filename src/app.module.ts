@@ -4,12 +4,13 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import {TransactionModule} from "./modules/transaction/transaction.module";
 import {LookupModule} from "./modules/lookup/lookup.module";
-
+const dotenv = require('dotenv');
+dotenv.config()
 @Module({
   imports: [
       TransactionModule,
       LookupModule,
-      MongooseModule.forRoot('mongodb+srv://admin:admin@cluster0.3ldeb.mongodb.net/stageRaenaDB?retryWrites=true&w=majority')
+      MongooseModule.forRoot(process.env.PROD_MONGO_URI)
   ],
   controllers: [AppController],
   providers: [AppService],
