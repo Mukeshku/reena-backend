@@ -8,9 +8,9 @@ import {
     Delete,
 } from '@nestjs/common';
 
-import { TransactionService } from './transaction.service';
+import { TransactionService } from '../service/transaction.service';
 
-@Controller('transactions')
+@Controller('api/transactions')
 export class TransationController {
 
     constructor(private readonly transactionService: TransactionService) {}
@@ -25,7 +25,7 @@ export class TransationController {
         return { id: generatedId };
     }
 
-    @Get()
+    @Get('/lookup')
     async getAllProducts() {
         const transactions = await this.transactionService.getTransactions();
         return transactions;

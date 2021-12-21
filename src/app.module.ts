@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import {TransactionModule} from "./modules/transaction/transaction.module";
-import {LookupModule} from "./modules/lookup/lookup.module";
+import {TransactionModule} from "./modules/transaction.module";
+import {LookupModule} from "./modules/lookup.module";
 const dotenv = require('dotenv');
 dotenv.config()
 @Module({

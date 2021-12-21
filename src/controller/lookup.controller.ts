@@ -1,6 +1,6 @@
 import {Body, Controller, Get, Post,} from '@nestjs/common';
 
-import {LookUpService} from './lookup.service';
+import {LookUpService} from '../service/lookup.service';
 
 @Controller('api/lookup')
 export class LookupController {
