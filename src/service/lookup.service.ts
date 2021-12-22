@@ -6,7 +6,7 @@ import {look_up_points} from '../model/lookup.model';
 import {PointsDtoRes} from 'src/model/Dto/PointsDtoResponse';
 import {getUniqueArray} from "../common/utils/generatedpointsUtils";
 import {AppConstants} from '../common/constants/AppConstants'
-import { PointsDto } from '/Users/mmt7162/Downloads/raena-backend/src/model/Dto/PointsDto';
+import {PointsDto} from '../model/Dto/PointsDto'
 
 @Injectable()
 export class LookUpService {
