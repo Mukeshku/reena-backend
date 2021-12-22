@@ -3,9 +3,8 @@ import {Body, Controller, Get, ParseArrayPipe, Post,} from '@nestjs/common';
 import {LookUpService} from '../service/lookup.service';
 import {PointsDto}  from  '../model/Dto/PointsDto'
 import { PointsDtoRes } from 'src/model/Dto/PointsDtoResponse';
-import { resolve } from 'path/posix';
-import { rejects } from 'assert';
-
+import { Request, Response } from 'express';
+import { Req, Res } from '@nestjs/common';
 
 
 
@@ -15,8 +14,10 @@ export class PointGeneratorController {
     constructor(private readonly lookupService: LookUpService) {}
 
     @Post()
-    async calculatePoints( @Body(new ParseArrayPipe({ items: PointsDto }))
-    pointsDto: PointsDto[],   
+    async calculatePoints(
+        @Body(new ParseArrayPipe({ items: PointsDto })) pointsDto: PointsDto[],
+        @Req() request: Request,
+        @Res() response: Response
     ) {
        // console.log(pointsDto);
         let res : PointsDtoRes
@@ -53,14 +54,13 @@ export class PointGeneratorController {
               // let response = new Promise<PointsDto>((resolve,reject) =>{
                 res ={"pointsGenerated": Math.floor(parseFloat(points.toFixed(2)))}
                 //})
-                return res
+                return response.status(200).send({pointsGenerated: Math.floor(parseFloat(points.toFixed(2)))});
             }).catch(e => {
                console.log("s222"+e)
-                return {msg : "something went wrong"+e};
+                return response.status(500).send({msg : "something went wrong"+ e });
             });
         } catch (e) {
-            console.log(e)
-            return {pointsGenerated: 0}
+             return response.status(500).send({msg : "something went wrong"+ e });
         }
     }
 }
