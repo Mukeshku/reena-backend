@@ -8,13 +8,15 @@ import { LookUpService } from 'src/service/lookup.service';
 import { TransactionService } from 'src/service/transaction.service';
 import { LookUpSchema } from 'src/model/lookup.model';
 import { TransactionSchema } from 'src/model/transaction.model';
+import {SummaryController} from "../controller/summary.controller";
+
 @Module({
     imports: [MongooseModule.forFeature([
     { name: 'resellers', schema: ResellerSchema },
     { name: 'look_up_points', schema: LookUpSchema },
     { name: 'transactions', schema: TransactionSchema}
     ])],
-    controllers: [ResellerController],
+    controllers: [ResellerController, SummaryController],
     providers: [LookUpService,TransactionService,ResellerService],
 })
 

@@ -21,7 +21,7 @@ export class ResellerService {
         }
         return data;
     }
-    
+
     async findProductResellerAndTierId(resellerId: string,tierId: string): Promise<resellers> {
         console.log("reseler",resellerId,tierId);
         let product: resellers;
@@ -44,7 +44,7 @@ export class ResellerService {
                 {resellerId},
                 {
                     $set: {"points": totalPoints},
-                }) 
+                })
         } catch (e) {
             throw new NotFoundException('Could not find reseller.');
         }
@@ -55,4 +55,15 @@ export class ResellerService {
         return product;
     }
 
+    async findItemFromResellerId(resellerId :String): Promise<resellers>{
+        let product: resellers;
+        try {
+            product = await this.resellerModel.findOne(
+                {resellerId},
+                {_id: 1, points: 1, resellerId: 1, tierId: 1}) // Projection is required to filter DATA.
+        } catch (error) {
+            throw new NotFoundException('Could not find product.');
+        }
+        return product;
+    }
 }
