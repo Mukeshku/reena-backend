@@ -5,6 +5,7 @@ import {PointsDto} from '../model/Dto/PointsDto'
 import {PointsDtoRes} from 'src/model/Dto/PointsDtoResponse';
 import {Request, Response} from 'express';
 import {Req, Res} from '@nestjs/common';
+import {getUniqueArray} from "../common/utils/generatedpointsUtils";
 
 
 @Controller('api/calculate-points-generated')
@@ -26,25 +27,23 @@ export class PointGeneratorController {
             pointsDto.forEach(item => {
                 promises.push(this.lookupService.findProductBrandAndTierId(item.brandId, item.tierId));
             });
+
             Promise.all(promises).then(results => {
                 results = results.filter(i => i !== null);
-                const uniqueArray = results.filter((result, index) => {
-                    const _result = JSON.stringify(result);
-                    return index === results.findIndex(obj => {
-                        return JSON.stringify(obj) === _result;
-                    });
-                });
+                const uniqueArray = getUniqueArray(results);
+
                 for (let j = 0; j < uniqueArray.length; j++) {
                     let flag = false;
-                    const {multiplier} = results[j]
-                    for (let i = 0; i < pointsDto.length; i++) {
-                        const {quantity, retailPrice} = pointsDto[i]
-                        console.log(multiplier, quantity, retailPrice)
-                        if (uniqueArray[j].brandId === pointsDto[i].brandId && uniqueArray[j].tierId === pointsDto[i].tierId) {
+                    const {multiplier} = results[j] || {};
+
+                    pointsDto.forEach(pointsObj => {
+                        const {quantity, retailPrice, brandId, tierId} = pointsObj || {}
+                        if (uniqueArray[j].brandId === brandId && uniqueArray[j].tierId === tierId) {
                             points += Math.floor(multiplier * quantity * retailPrice);
                             flag = true;
                         }
-                    }
+                    })
+
                     if (!flag) {
                         break;
                     }
