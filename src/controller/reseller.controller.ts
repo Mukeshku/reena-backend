@@ -42,7 +42,12 @@ export class ResellerController {
             }
             const { resellerId, orderId, tierId, type, currency, entityType } = getRequestProperties(req);
             if (! await this.transactionService.countDocuments(resellerId,orderId)) {
-                let reseller = await this.resellerService.findProductResellerAndTierId(resellerId, tierId);
+                let reseller :any
+                try{
+                    reseller = await this.resellerService.findProductResellerAndTierId(resellerId, tierId);
+                }catch(e){
+                    return res.status(404).send({message: e});
+                }
                 let transaction:any
                 transaction = getTransactionModel(type, reseller, tierId, req, orderId, currency, entityType)
                 let points = [];
