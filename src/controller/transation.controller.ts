@@ -1,21 +1,13 @@
-import {
-    Controller,
-    Post,
-    Body,
-    Get,
-    Param,
-    Patch,
-    Delete,
-} from '@nestjs/common';
+import {Controller, Get,} from '@nestjs/common';
 
-import { TransactionService } from '../service/transaction.service';
+import {TransactionService} from '../service/transaction.service';
 
 //todo ashish delete this controller
 // Error handling
 // Utilty in config
 // Constant
 // Code rectify
-// Swagger
+// Swagger --> Complete
 // Seperate mongodb connection
 
 
@@ -23,7 +15,6 @@ import { TransactionService } from '../service/transaction.service';
 export class TransationController {
 
     constructor(private readonly transactionService: TransactionService) {}
-
 
 
     @Get('/lookup')

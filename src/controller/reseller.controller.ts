@@ -1,14 +1,14 @@
-import {Body, Controller, Get, Post,Req,Res} from '@nestjs/common';
-import { timeStamp } from 'console';
-import { LookUpService } from 'src/service/lookup.service';
-import { TransactionService } from 'src/service/transaction.service';
+import {Controller, Post, Req, Res} from '@nestjs/common';
+import {LookUpService} from 'src/service/lookup.service';
+import {TransactionService} from 'src/service/transaction.service';
 import {Request, Response} from 'express';
 import {ResellerService} from '../service/reseller.service';
 import {ApiBody} from "@nestjs/swagger";
 import {WebhooksAPIDTO} from "../model/Dto/WebhooksAPIDTO";
+import {EndPoints} from '../common/constants/endPoints'
 
 
-@Controller('api/webhooks')
+@Controller(EndPoints.WEBHOOKS)
 export class ResellerController {
 
     constructor(

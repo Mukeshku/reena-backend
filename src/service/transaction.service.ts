@@ -2,7 +2,7 @@ import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
 
-import { Transactions } from '../model/transaction.model';
+import {Transactions} from '../model/transaction.model';
 
 @Injectable()
 export class TransactionService {
@@ -86,7 +86,7 @@ export class TransactionService {
             throw new NotFoundException('Could not find product.');
         }
         console.log("in transacrtiona");
-        
+
         return product;
     }
     async countDocuments(resellerId: string,orderId:string): Promise<any> {

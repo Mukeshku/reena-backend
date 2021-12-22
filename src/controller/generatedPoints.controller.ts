@@ -1,16 +1,16 @@
-import {Body, Controller, Get, ParseArrayPipe, Post,} from '@nestjs/common';
+import {Body, Controller, ParseArrayPipe, Post, Req, Res,} from '@nestjs/common';
 
 import {LookUpService} from '../service/lookup.service';
 import {PointsDto} from '../model/Dto/PointsDto'
 import {PointsDtoRes} from 'src/model/Dto/PointsDtoResponse';
 import {Request, Response} from 'express';
-import {Req, Res} from '@nestjs/common';
 import {getUniqueArray} from "../common/utils/generatedpointsUtils";
 import {ApiBody} from "@nestjs/swagger";
 import {CalulatePointsGenratedDTO} from "../model/Dto/CalulatePointsGenratedDTO";
+import {EndPoints} from '../common/constants/endPoints'
 
 
-@Controller('api/calculate-points-generated')
+@Controller(EndPoints.CALCULATE_POINTS_GENERATED)
 export class PointGeneratorController {
 
     constructor(private readonly lookupService: LookUpService) {

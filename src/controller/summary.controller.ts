@@ -2,11 +2,12 @@ import {Controller, Get, Param, Req, Res} from '@nestjs/common';
 import {Request, Response} from 'express';
 import {ResellerService} from '../service/reseller.service';
 import {resellers} from "../model/reseller.model";
-import { TransactionService } from 'src/service/transaction.service';
+import {TransactionService} from 'src/service/transaction.service';
 import {ApiParam} from "@nestjs/swagger";
+import {EndPoints} from '../common/constants/endPoints'
 
 
-@Controller('/api/resellers')
+@Controller(EndPoints.RESELLERS)
 export class SummaryController {
 
     constructor(
@@ -14,7 +15,7 @@ export class SummaryController {
         private readonly transactionService: TransactionService
         ) {}
 
-    @Get('/:resellerId/summary')
+    @Get(EndPoints.SUMMARY)
     @ApiParam({name:'resellerId',
         required: true,
         description: 'Reseller unique identifier',
@@ -37,7 +38,7 @@ export class SummaryController {
     }
 
 
-    @Get('/:resellerId/loyaltyTransactions')
+    @Get(EndPoints.LOYALTY_TRANSACTIONS)
     @ApiParam({name:'resellerId',
         required: true,
         description: 'Reseller unique identifier',
