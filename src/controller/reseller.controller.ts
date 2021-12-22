@@ -7,6 +7,7 @@ import {ApiBody} from "@nestjs/swagger";
 import {WebhooksAPIDTO} from "../model/Dto/WebhooksAPIDTO";
 import {EndPoints} from '../common/constants/endPoints'
 import {PayloadConstants} from '../common/constants/PayloadConstants'
+import { resellers } from 'src/model/reseller.model';
 
 
 @Controller(EndPoints.WEBHOOKS)
@@ -37,60 +38,24 @@ export class ResellerController {
         
         try {
             if (!req.body.data.resellerInfo){
-                 return res.status(404).send(   {message: 'Transaction not created since order has no reseller'});
+                 return res.status(404).send({message: 'Transaction not created since order has no reseller'});
             }
-            const orderId = req.body.data.id || '';
-            const resellerId = req.body.data.resellerInfo.id || '';
-            const tierId = req.body.data.resellerInfo.tierId || '';
-            const currency = req.body.data.currency || '';
-            const entityType = req.body.data.entityType || '';
-            const type = req.body.type || '';
+            const { resellerId, orderId, tierId, type, currency, entityType } = getRequestProperties(req);
             if (! await this.transactionService.countDocuments(resellerId,orderId)) {
-                console.log("No Doc availablle");
                 let reseller = await this.resellerService.findProductResellerAndTierId(resellerId, tierId);
                 let transaction:any
-                transaction = {
-                    eventType: type === 'order_payment_done' ? 'order.payment_done' : type,
-                    resId: reseller._id,
-                    tierId,
-                    resellerId: req.body.data.resellerInfo.id,
-                    type: req.body.type,
-                    data: {
-                        id: orderId,
-                        currency: currency,
-                        entityType,
-                        items: Array,
-                        totalAmount:0,
-                    },
-                    points:0
-                }
+                transaction = getTransactionModel(type, reseller, tierId, req, orderId, currency, entityType)
                 let points = [];
                 req.body.data.items.forEach((item) => {
                     points.push(getProductPoints(item, tierId,this.lookUpService));
                 });
                 const tempItems = await Promise.all(points);
-                console.log("in before",tempItems);
-                //check filter
-                transaction.data.items = tempItems
-                console.log("in after",transaction.data.items);
-                let totalPoints = 0;
-                let totalAmount = 0;
-                transaction.data.items.forEach(i => {
-                    totalPoints += i.points;
-                    totalAmount += i.retailPrice;
-                });
-                transaction.points = totalPoints;
-                transaction.data.totalAmount = parseFloat(totalAmount.toFixed(2));
+                transaction = updateTransactionWithPoints(transaction, tempItems);
                 if (transaction.points <= 0){
                  return res.status(200).send({message: 'Transaction not created since order generated 0 points'});
                 }
-
                 this.transactionService.findOneAndUpdate(resellerId,orderId,transaction).then(data => {
-                    // To-Do  Handle  req
-                   // if (error){
-                     //return res.status(500).send(error);
-                    //}
-                    this.resellerService.updateOne(resellerId,reseller.points + totalPoints).then(id => {
+                    this.resellerService.updateOne(resellerId,reseller.points +  transaction.points).then(id => {
                         return res.status(200).send({message: 'Transaction Successfully Saved', data: data});
                     })
                 });
@@ -101,6 +66,47 @@ export class ResellerController {
             return res.status(500).send({message: 'Internal server error', e});
         }
     }
+}
+
+function updateTransactionWithPoints(transaction: any, tempItems: any[]) {
+    transaction.data.items = tempItems;
+    let totalPoints = 0;
+    let totalAmount = 0;
+    transaction.data.items.forEach(item => {
+        totalPoints += item.points;
+        totalAmount += item.retailPrice;
+    });
+    transaction.points = totalPoints;
+    transaction.data.totalAmount = parseFloat(totalAmount.toFixed(2));
+    return transaction;
+}
+
+function getRequestProperties(req) {
+    const orderId = req.body.data.id || '';
+    const resellerId = req.body.data.resellerInfo.id || '';
+    const tierId = req.body.data.resellerInfo.tierId || '';
+    const currency = req.body.data.currency || '';
+    const entityType = req.body.data.entityType || '';
+    const type = req.body.type || '';
+    return { resellerId, orderId, tierId, type, currency, entityType };
+}
+
+function getTransactionModel(type: any, reseller: resellers, tierId: any, req, orderId: any, currency: any, entityType: any): any {
+    return {
+        eventType: type === 'order_payment_done' ? 'order.payment_done' : type,
+        resId: reseller._id,
+        tierId,
+        resellerId: req.body.data.resellerInfo.id,
+        type: req.body.type,
+        data: {
+            id: orderId,
+            currency: currency,
+            entityType,
+            items: Array,
+            totalAmount: 0,
+        },
+        points: 0
+    };
 }
 
 function getProductPoints(item, tierId,lookupService) {
