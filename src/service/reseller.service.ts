@@ -26,7 +26,7 @@ export class ResellerService {
      }
 
     async findProductResellerAndTierId(resellerId: string,tierId: string): Promise<resellers> {
-        console.log("reseler",resellerId,tierId);
+        console.log("reseller",resellerId,tierId);
         let product: resellers;
         try {
             product = await this.resellerModel.findOneAndUpdate(
