@@ -3,6 +3,7 @@ import {Request, Response} from 'express';
 import {ResellerService} from '../service/reseller.service';
 import {resellers} from "../model/reseller.model";
 import { TransactionService } from 'src/service/transaction.service';
+import {ApiParam} from "@nestjs/swagger";
 
 
 @Controller('/api/resellers')
@@ -13,10 +14,15 @@ export class SummaryController {
         private readonly transactionService: TransactionService
         ) {}
 
-    @Get('/:id/summary')
-    async summary(@Req() req: Request, @Res() res: Response, @Param('id') resellerId) {
+    @Get('/:resellerId/summary')
+    @ApiParam({name:'resellerId',
+        required: true,
+        description: 'Reseller unique identifier',
+        schema: { oneOf: [{type: 'string'}]}
+    })
+    async summary(@Req() req: Request, @Res() res: Response, @Param('resellerId') resellerId) {
         try {
-            console.log('Reseller id from URL is  ', resellerId);
+            console.log('Reseller id from URL is  ', resellerId , req.query);
             let resellerData: resellers = await this.resellerService.findItemFromResellerId(resellerId);
             console.log('DATA from DB is ', resellerData);
 
@@ -29,14 +35,20 @@ export class SummaryController {
             return res.status(500).send({error: 'something went wrong'});
         }
     }
-    @Get('/:id/loyaltyTransactions')
+
+
+    @Get('/:resellerId/loyaltyTransactions')
+    @ApiParam({name:'resellerId',
+        required: true,
+        description: 'Reseller unique identifier',
+        schema: { oneOf: [{type: 'string'}]}
+    })
     async loyaltyTransactions(
         @Req() req: Request,
-        @Res() res: Response
+        @Res() res: Response,
+        @Param('resellerId') resellerId
     ) {
-        console.log("re",req.body.data);
         try {
-            let resellerId = req.params.id;
             let offset = req.query.page;
             let pagesize:any = req.query.pageSize;
             let sort = req.query.sort;
@@ -52,7 +64,7 @@ export class SummaryController {
            let pagelimit : any = pageOptions.limit;
            let skip = pageFinal > 0 ? ((pageFinal - 1) * pageOptions.limit) : 0;
             let response =  await this.transactionService.getPageResult(resellerId,skip,pagelimit,sType);
-           
+
             if (!response) {
                 return res.status(500).json({"msg":"error"});
             }
@@ -67,7 +79,7 @@ export class SummaryController {
             } else {
                 res.status(200).json([]);
             }
-                
+
         } catch (e) {
             return res.status(500).json(e);
         }

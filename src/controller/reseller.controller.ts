@@ -4,6 +4,8 @@ import { LookUpService } from 'src/service/lookup.service';
 import { TransactionService } from 'src/service/transaction.service';
 import {Request, Response} from 'express';
 import {ResellerService} from '../service/reseller.service';
+import {ApiBody} from "@nestjs/swagger";
+import {WebhooksAPIDTO} from "../model/Dto/WebhooksAPIDTO";
 
 
 @Controller('api/webhooks')
@@ -16,12 +18,52 @@ export class ResellerController {
         ) {}
 
     @Post()
+    @ApiBody(
+        {type: WebhooksAPIDTO,
+            description: "The Description for the Post Body. Please look into the DTO for more info.",
+            examples: {
+                a: {
+                    summary: "Payload",
+                    description: "Edit the body with actual data",
+                    value: {
+                        "type":"order_payment_done",
+                        "data":{
+                            "entity_type":"order",
+                            "id":"OD1639035692037433REG",
+                            "resellerInfo":{
+                                "id":"886fb0c8-a5a5-4daf-bf72-d00949b83188",
+                                "tierId":"07030fbe-5801-4318-9e97-fe33fa169894",
+                                "tierName":"tier_name1"
+                            },
+                            "items":[
+                                {
+                                    "brandId":"0f6d4519-ed6c-4c2a-9079-113bbe4a7e14",
+                                    "tierId":"bf645e97-8a48-4977-8367-e987489760f9",
+                                    "productId":"product_uuid1",
+                                    "retailPrice":300,
+                                    "quantity":3,
+                                    "sku": "sku_details1"
+                                },
+                                {
+                                    "brandId":"246a4647-c160-4353-b3ff-5c1bd0cd535b",
+                                    "tierId":"07030fbe-5801-4318-9e97-fe33fa169894",
+                                    "productId":"product_uuid2",
+                                    "retailPrice":400,
+                                    "quantity":2,
+                                    "sku": "sku_details2"
+                                }
+                            ]
+                        }
+                    } as WebhooksAPIDTO
+                }
+            }}
+    )
     async webhooks(
         @Req() req: Request,
         @Res() res: Response
     ) {
         console.log("re",req.body.data);
-        
+
         try {
             if (!req.body.data.resellerInfo){
                  return res.status(404).send(   {message: 'Transaction not created since order has no reseller'});
@@ -55,8 +97,8 @@ export class ResellerController {
                 req.body.data.items.forEach((item) => {
                     points.push(getProductPoints(item, tierId,this.lookUpService));
                 });
-                const tempItems = await Promise.all(points); 
-                console.log("in before",tempItems);  
+                const tempItems = await Promise.all(points);
+                console.log("in before",tempItems);
                 //check filter
                 transaction.data.items = tempItems
                 console.log("in after",transaction.data.items);
@@ -71,7 +113,7 @@ export class ResellerController {
                 if (transaction.points <= 0){
                  return res.status(200).send({message: 'Transaction not created since order generated 0 points'});
                 }
-                
+
                 this.transactionService.findOneAndUpdate(resellerId,orderId,transaction).then(data => {
                     // To-Do  Handle  req
                    // if (error){
@@ -88,12 +130,8 @@ export class ResellerController {
             return res.status(500).send({message: 'Internal server error', e});
         }
     }
-
-    @Get()
-    async Lookup() {
-        return await this.resellerService.getAll();
-    }
 }
+
 function getProductPoints(item, tierId,lookupService) {
     return new Promise((resolve, reject) => {
         lookupService.findOne(item.brandId, tierId).then((data, error) => {
