@@ -27,7 +27,6 @@ export class PointGeneratorController {
             pointsDto.forEach(item => {
                 promises.push(this.lookupService.findProductBrandAndTierId(item.brandId, item.tierId));
             });
-
             Promise.all(promises).then(results => {
                 results = results.filter(i => i !== null);
                 const uniqueArray = getUniqueArray(results);

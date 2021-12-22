@@ -73,6 +73,31 @@ export class TransactionService {
          }
          return product;
      }
+    async findOneAndUpdate(resellerId: string,orderId: string,transaction:any): Promise<Transactions> {
+        let product:Transactions;
+        try {
+            product = await this.transactionsModel.findOneAndUpdate({
+                resellerId,
+                'data.id': orderId,
+            }, transaction, {upsert: true, new: true}).exec();
+        } catch (error) {
+            console.log("error in transacrtiona");
+            throw new NotFoundException('Could not find product.');
+        }
+        console.log("in transacrtiona");
+        
+        return product;
+    }
+    async countDocuments(resellerId: string,orderId:string): Promise<Transactions> {
+        console.log("transaction",resellerId,orderId);
+        let product;
+        try {
+            product = await this.transactionsModel.countDocuments({resellerId, 'data.id': orderId}, {limit: 1}).exec();
+        } catch (error) {
+            throw new NotFoundException('Could not find document.');
+        }
+        return product;
+    }
 
     async findProductByData(tierId: string, brandId: string, multiplier: Number): Promise<Transactions> {
         let product;

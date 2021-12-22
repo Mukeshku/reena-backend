@@ -2,10 +2,11 @@ import * as mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 export const TransactionSchema = new mongoose.Schema({
-/*    resellerId: { type: String, required: true },
+    resellerId: { type: String, required: true },
     createdAt: { type: String, required: true },
     status: { type: String, required: true },
-    data: [{ type: Schema.Types.ObjectId, ref: 'Data' }]*/
+    data: [{ type: Schema.Types.ObjectId, ref: 'Data' }],
+    points:{ type: Schema.Types.Number, required: false },
 });
 
 const dataSchema =  new mongoose.Schema({

@@ -74,7 +74,16 @@ export class LookUpService {
         }
         return data;
     }
-
+    async findOne(brandId: string,tierId: string): Promise<look_up_points> {
+        console.log("items");
+        let data:look_up_points;
+        try {
+            data = await this.lookUpModel.findOne({brandId,tierId})
+        } catch (error) {
+            throw new NotFoundException('Could not find product.');
+        }
+        return data;
+    }
     async findProductByData(tierId: string, brandId: string, multiplier: Number): Promise<string> {
         let product: look_up_points;
         try {
