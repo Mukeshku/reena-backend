@@ -2,11 +2,11 @@ import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
 
-import {Transactions} from '../model/transaction.model';
+import { Transactions } from '../model/transaction.model';
 
 @Injectable()
 export class TransactionService {
-    constructor(@InjectModel('Transactions') private readonly transactionsModel: Model<Transactions>) {}
+    constructor(@InjectModel('transactions') private readonly transactionsModel: Model<Transactions>) {}
 
     /*  async insertProduct(title: string, desc: string, price: number) {
           const transactionsModel = new this.transactionsModel({
@@ -73,29 +73,32 @@ export class TransactionService {
          }
          return product;
      }
-    async findOneAndUpdate(resellerId: string,orderId: string,transaction:any): Promise<Transactions> {
-        let product:Transactions;
+    async findOneAndUpdate(resellerId: string,orderId: string,transaction:any): Promise<any> {
+        let product:any;
+        console.log("in transacrtiona",transaction);
         try {
             product = await this.transactionsModel.findOneAndUpdate({
                 resellerId,
                 'data.id': orderId,
             }, transaction, {upsert: true, new: true}).exec();
         } catch (error) {
-            console.log("error in transacrtiona");
+            console.log("error in transacrtiona",error);
             throw new NotFoundException('Could not find product.');
         }
         console.log("in transacrtiona");
         
         return product;
     }
-    async countDocuments(resellerId: string,orderId:string): Promise<Transactions> {
+    async countDocuments(resellerId: string,orderId:string): Promise<any> {
         console.log("transaction",resellerId,orderId);
-        let product;
+        let product = 0;
         try {
-            product = await this.transactionsModel.countDocuments({resellerId, 'data.id': orderId}, {limit: 1}).exec();
+            product = await this.transactionsModel.count({"resellerId":resellerId, 'data.id': orderId}).exec();
         } catch (error) {
             throw new NotFoundException('Could not find document.');
         }
+        console.log(product);
+        
         return product;
     }
 

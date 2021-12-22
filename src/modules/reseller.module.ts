@@ -12,7 +12,7 @@ import { TransactionSchema } from 'src/model/transaction.model';
     imports: [MongooseModule.forFeature([
     { name: 'resellers', schema: ResellerSchema },
     { name: 'look_up_points', schema: LookUpSchema },
-    { name: 'Transactions', schema: TransactionSchema}
+    { name: 'transactions', schema: TransactionSchema}
     ])],
     controllers: [ResellerController],
     providers: [LookUpService,TransactionService,ResellerService],

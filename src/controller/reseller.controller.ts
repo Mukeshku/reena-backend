@@ -4,7 +4,6 @@ import { LookUpService } from 'src/service/lookup.service';
 import { TransactionService } from 'src/service/transaction.service';
 import {Request, Response} from 'express';
 import {ResellerService} from '../service/reseller.service';
-import { Transactions } from 'src/model/transaction.model';
 
 
 @Controller('api/webhooks')
@@ -33,10 +32,11 @@ export class ResellerController {
             const currency = req.body.data.currency || '';
             const entityType = req.body.data.entityType || '';
             const type = req.body.type || '';
-            if (!await this.transactionService.countDocuments(resellerId,orderId)) {
+            if (! await this.transactionService.countDocuments(resellerId,orderId)) {
                 console.log("No Doc availablle");
                 let reseller = await this.resellerService.findProductResellerAndTierId(resellerId, tierId);
-                let transaction = {
+                let transaction:any
+                transaction = {
                     eventType: type === 'order_payment_done' ? 'order.payment_done' : type,
                     resId: reseller._id,
                     tierId,
@@ -46,7 +46,7 @@ export class ResellerController {
                         id: orderId,
                         currency: currency,
                         entityType,
-                        items: [],
+                        items: Array,
                         totalAmount:0,
                     },
                     points:0
@@ -55,8 +55,11 @@ export class ResellerController {
                 req.body.data.items.forEach((item) => {
                     points.push(getProductPoints(item, tierId,this.lookUpService));
                 });
-                const tempItems = await Promise.all(points);
-                transaction.data.items = tempItems.filter(i => i.points !== 0);
+                const tempItems = await Promise.all(points); 
+                console.log("in before",tempItems);  
+                //check filter
+                transaction.data.items = tempItems
+                console.log("in after",transaction.data.items);
                 let totalPoints = 0;
                 let totalAmount = 0;
                 transaction.data.items.forEach(i => {

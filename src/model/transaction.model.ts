@@ -1,37 +1,34 @@
-import * as mongoose from 'mongoose';
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+require('mongoose-double')(mongoose);
 
-export const TransactionSchema = new mongoose.Schema({
-    resellerId: { type: String, required: true },
-    createdAt: { type: String, required: true },
-    status: { type: String, required: true },
-    data: [{ type: Schema.Types.ObjectId, ref: 'Data' }],
-    points:{ type: Schema.Types.Number, required: false },
-});
+export const TransactionSchema = new Schema({
+    resId: {type: Schema.Types.String, trim: true, required: true},
+    resellerId: {type: Schema.Types.String},
+    eventType: {type: Schema.Types.String}, // type of event 'order.payment_done'
+    tierId: Schema.Types.String,
+    status: {type: Schema.Types.String, default: 'credited'},
+    expiryDate: Schema.Types.Date,
+    points: {type: Schema.Types.Number},
+    data: {
+        entityType: {type: Schema.Types.String}, // 'order'
+        id: {type: Schema.Types.String}, // 'orderId
+        currency: {type: Schema.Types.String},
+        totalAmount: {type: mongoose.Types.Double},
+        discountAmount: {type: mongoose.Types.Double},
+        items: [{
+            brandId: Schema.Types.String,
+            multiplier: {type: mongoose.Types.Double},
+            productId: Schema.Types.String,
+            retailPrice: Schema.Types.Number,
+            quantity: Schema.Types.Number,
+            sku: Schema.Types.String,
+            brandName: Schema.Types.String,
+            points: Schema.Types.Number
+        }]
+    },
 
-const dataSchema =  new mongoose.Schema({
-    id: { type: String, required: false},
-    currency: { type: String, required: true },
-    entityType: { type: String, required: true },
-    items: [{ type: Schema.Types.Array, ref: 'Item' }],
-    totalAmount: {type: Number, required: true},
-    //items: Item[];
-});
-
-const itemSchema = new mongoose.Schema({
-    brandId: {type: String, required: true},
-    multiplier: {type: Number, required: true},
-    productId: {type: String, required: true},
-    retailPrice: {type: Number, required: true},
-    quantity: {type: Number, required: true},
-    sku: {type: String, required: true},
-    brandName: {type: String, required: true},
-    points: {type: Number, required: true},
-    _id: {type: String, required: true}
-})
-
-const Data = mongoose.model('Data', dataSchema);
-const Item = mongoose.model('Item',  itemSchema);
+}, {timestamps: true, versionKey: false});
 
     export interface Item {
         brandId: string;
@@ -42,7 +39,6 @@ const Item = mongoose.model('Item',  itemSchema);
         sku: string;
         brandName: string;
         points: number;
-        _id: string;
     }
 
     export interface Data {
@@ -54,16 +50,12 @@ const Item = mongoose.model('Item',  itemSchema);
     }
 
     export interface Transactions {
-        _id: string;
         data: Data;
         resellerId: string;
-        createdAt: string;
         eventType: string;
         points: number;
         resId: string;
         status: string;
         tierId: string;
-        updatedAt: string;
     }
-
 
