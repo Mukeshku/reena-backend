@@ -6,6 +6,7 @@ import {ResellerService} from '../service/reseller.service';
 import {ApiBody} from "@nestjs/swagger";
 import {WebhooksAPIDTO} from "../model/Dto/WebhooksAPIDTO";
 import {EndPoints} from '../common/constants/endPoints'
+import {PayloadConstants} from '../common/constants/PayloadConstants'
 
 
 @Controller(EndPoints.WEBHOOKS)
@@ -25,36 +26,7 @@ export class ResellerController {
                 a: {
                     summary: "Payload",
                     description: "Edit the body with actual data",
-                    value: {
-                        "type":"order_payment_done",
-                        "data":{
-                            "entity_type":"order",
-                            "id":"OD1639035692037433REG",
-                            "resellerInfo":{
-                                "id":"886fb0c8-a5a5-4daf-bf72-d00949b83188",
-                                "tierId":"07030fbe-5801-4318-9e97-fe33fa169894",
-                                "tierName":"tier_name1"
-                            },
-                            "items":[
-                                {
-                                    "brandId":"0f6d4519-ed6c-4c2a-9079-113bbe4a7e14",
-                                    "tierId":"bf645e97-8a48-4977-8367-e987489760f9",
-                                    "productId":"product_uuid1",
-                                    "retailPrice":300,
-                                    "quantity":3,
-                                    "sku": "sku_details1"
-                                },
-                                {
-                                    "brandId":"246a4647-c160-4353-b3ff-5c1bd0cd535b",
-                                    "tierId":"07030fbe-5801-4318-9e97-fe33fa169894",
-                                    "productId":"product_uuid2",
-                                    "retailPrice":400,
-                                    "quantity":2,
-                                    "sku": "sku_details2"
-                                }
-                            ]
-                        }
-                    } as WebhooksAPIDTO
+                    value: PayloadConstants.WEBHOOKS_API_SAMPLE_PAYLOAD as WebhooksAPIDTO
                 }
             }}
     )
@@ -119,7 +91,7 @@ export class ResellerController {
                    // if (error){
                      //return res.status(500).send(error);
                     //}
-                    this.resellerService.updateOne(resellerId,reseller.points + totalPoints).then(d => {
+                    this.resellerService.updateOne(resellerId,reseller.points + totalPoints).then(id => {
                         return res.status(200).send({message: 'Transaction Successfully Saved', data: data});
                     })
                 });

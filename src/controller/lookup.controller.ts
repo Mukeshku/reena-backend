@@ -4,6 +4,8 @@ import {LookUpService} from '../service/lookup.service';
 import {ApiBody} from "@nestjs/swagger";
 import {LookUpControllerBodyDTO} from "../model/Dto/LookUpControllerBodyDTO";
 import {EndPoints} from '../common/constants/endPoints'
+import {PayloadConstants} from '../common/constants/PayloadConstants'
+
 
 @Controller(EndPoints.LOOKUP)
 export class LookupController {
@@ -18,11 +20,7 @@ export class LookupController {
                 a: {
                     summary: "Payload",
                     description: "Edit the body with actual data",
-                    value: {
-                        "brandId" : "c74cfe28-6796-4d-ecc9f",
-                        "multiplier" : 0.999999,
-                        "tierId" : "bf645e97-8a48-4977-8367-e7489760f9"
-                    } as LookUpControllerBodyDTO
+                    value: PayloadConstants.LOOKUP_DTO_SAMPLE_PAYLOAD as LookUpControllerBodyDTO
                 }
             }}
     )

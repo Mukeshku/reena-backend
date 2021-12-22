@@ -8,6 +8,8 @@ import {getUniqueArray} from "../common/utils/generatedpointsUtils";
 import {ApiBody} from "@nestjs/swagger";
 import {CalulatePointsGenratedDTO} from "../model/Dto/CalulatePointsGenratedDTO";
 import {EndPoints} from '../common/constants/endPoints'
+import {AppConstants} from '../common/constants/AppConstants'
+import {PayloadConstants} from '../common/constants/PayloadConstants'
 
 
 @Controller(EndPoints.CALCULATE_POINTS_GENERATED)
@@ -25,20 +27,7 @@ export class PointGeneratorController {
                 a: {
                     summary: "Payload",
                     description: "Edit the body with actual data",
-                    value: [
-                        {
-                            "brandId": "2ea2ccd1-5c45-4900-acf8-eaf3b5a7c0c1",
-                            "tierId": "bf645e97-8a48-4977-8367-e987489760f9",
-                            "quantity": 1,
-                            "retailPrice": 100
-                        },
-                        {
-                            "brandId": "b7ece182-4936-47e2-8f94-153c2c77270b",
-                            "tierId": "bf645e97-8a48-4977-8367-e987489760f9",
-                            "quantity": 1,
-                            "retailPrice": 7000
-                        }
-                    ] as [CalulatePointsGenratedDTO, CalulatePointsGenratedDTO]
+                    value: PayloadConstants.CALCULATED_GENERATED_POINTS_DTO_SAMPLE_PAYLOAD as [CalulatePointsGenratedDTO, CalulatePointsGenratedDTO]
                 }
             }}
     )
@@ -77,10 +66,10 @@ export class PointGeneratorController {
                 res = {"pointsGenerated": Math.floor(parseFloat(points.toFixed(2)))}
                 return response.status(200).send({pointsGenerated: Math.floor(parseFloat(points.toFixed(2)))});
             }).catch(e => {
-                return response.status(500).send({msg: "something went wrong" + e});
+                return response.status(500).send({msg: AppConstants.GENERIC_ERROR_MESSAGE + e});
             });
         } catch (e) {
-            return response.status(500).send({msg: "something went wrong" + e});
+            return response.status(500).send({msg: AppConstants.GENERIC_ERROR_MESSAGE + e});
         }
     }
 }
