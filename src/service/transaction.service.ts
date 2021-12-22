@@ -91,25 +91,32 @@ export class TransactionService {
     }
     async countDocuments(resellerId: string,orderId:string): Promise<any> {
         console.log("transaction",resellerId,orderId);
-        let product = 0;
+        let count = 0;
         try {
-            product = await this.transactionsModel.count({"resellerId":resellerId, 'data.id': orderId}).exec();
+            count = await this.transactionsModel.count({"resellerId":resellerId, 'data.id': orderId}).exec();
         } catch (error) {
             throw new NotFoundException('Could not find document.');
         }
-        console.log(product);
-        
-        return product;
+        console.log(count);
+        return count;
     }
-
-    async findProductByData(tierId: string, brandId: string, multiplier: Number): Promise<Transactions> {
+    async countResult(resellerId: string): Promise<any> {
+        console.log("transaction",resellerId);
+        let count = 0;
+        try {
+            count = await this.transactionsModel.count({"resellerId":resellerId}).exec();
+        } catch (error) {
+            throw new NotFoundException('Could not find document.');
+        }
+        console.log(count);
+        return count;
+    }
+    async getPageResult(resellerId: string, skip: number, limit: number,sType:any): Promise<any> {
         let product;
         try {
-            product = await this.transactionsModel.findOne({tierId, brandId, multiplier}).exec();
+            product = await this.transactionsModel.find({resellerId},{}).skip(skip).limit(limit)
+            .sort({createdAt: sType}).exec();
         } catch (error) {
-            throw new NotFoundException('Could not find product.');
-        }
-        if (!product) {
             throw new NotFoundException('Could not find product.');
         }
         return product;

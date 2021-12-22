@@ -15,15 +15,7 @@ export class TransationController {
 
     constructor(private readonly transactionService: TransactionService) {}
 
-    @Post()
-    async lookup(
-        @Body('tierId') tierId: string,
-        @Body('brandId') brandId: string,
-        @Body('multiplier') multiplier: number
-    ) {
-        const generatedId = await this.transactionService.findProductByData(tierId, brandId, multiplier);
-        return { id: generatedId };
-    }
+  
 
     @Get('/lookup')
     async getAllProducts() {
