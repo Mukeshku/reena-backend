@@ -9,18 +9,21 @@ export class ResellerService {
     constructor(@InjectModel('resellers') private readonly resellerModel: Model<resellers>) {
     }
 
-     async getAll(): Promise<resellers> {
-        let data;
+     async getSummary(resellerId,req,res){
         try {
-            data = await this.resellerModel.find({})
-        } catch (error) {
-            throw new NotFoundException('Could not find reseller.');
+            console.log('Reseller id from URL is  ', resellerId , req.query);
+            let resellerData: resellers = await this.findItemFromResellerId(resellerId);
+            console.log('DATA from DB is ', resellerData);
+            if (resellerData) {
+                return res.status(200).send(resellerData);
+            } else {
+                return res.status(500).send({error: 'No reseller found'});
+            }
+        } catch (e) {
+            return res.status(500).send({error: 'something went wrong'});
         }
-        if (!data) {
-            throw new NotFoundException('Could not find reseller.');
-        }
-        return data;
-    }
+
+     }
 
     async findProductResellerAndTierId(resellerId: string,tierId: string): Promise<resellers> {
         console.log("reseler",resellerId,tierId);

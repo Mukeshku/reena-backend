@@ -3,64 +3,62 @@ import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
 
 import {look_up_points} from '../model/lookup.model';
+import {PointsDtoRes} from 'src/model/Dto/PointsDtoResponse';
+import {getUniqueArray} from "../common/utils/generatedpointsUtils";
+import {AppConstants} from '../common/constants/AppConstants'
+import { PointsDto } from '/Users/mmt7162/Downloads/raena-backend/src/model/Dto/PointsDto';
 
 @Injectable()
 export class LookUpService {
     constructor(@InjectModel('look_up_points') private readonly lookUpModel: Model<look_up_points>) {
     }
 
-    /*  async insertProduct(title: string, desc: string, price: number) {
-          const transactionsModel = new this.transactionsModel({
-              title,
-              description: desc,
-              price,
-          });
-          const result = await transactionsModel.save();
-          return result.id as string;
-      }*/
+    async calculatePoint(request,response,pointsDto){
+        let res: PointsDtoRes
+        try {
+            let points = 0;
+            let promises = [];
+            pointsDto.forEach(item => {
+                promises.push(this.findProductBrandAndTierId(item.brandId, item.tierId));
+            });
+            Promise.all(promises).then(results => {
+                points = this.getPointsWrapper(results,pointsDto,points)
+                res = {"pointsGenerated": Math.floor(parseFloat(points.toFixed(2)))}
+                return response.status(200).send({pointsGenerated: Math.floor(parseFloat(points.toFixed(2)))});
+            }).catch(e => {
+                return response.status(500).send({msg: AppConstants.GENERIC_ERROR_MESSAGE + e});
+            });
+        } catch (e) {
+            return response.status(500).send({msg: AppConstants.GENERIC_ERROR_MESSAGE + e});
+        }
+    }
 
-    /* async getTransactions() {
-         const transactions = await this.transactionsModel.find().exec();
-         return JSON.stringify(transactions)
-     }
- */
-    /* async getSingleProduct(productId: string) {
-           const product = await this.findProduct(productId);
-           return {
-               id: product.id,
-               title: product.title,
-               description: product.description,
-               price: product.price,
-           };
-       }*/
+    private getPointsWrapper(results: any,pointsDto: PointsDto[],points:number){
 
-    /*   async updateProduct(
-           productId: string,
-           title: string,
-           desc: string,
-           price: number,
-       ) {
-           const updatedProduct = await this.findProduct(productId);
-           if (title) {
-               updatedProduct.title = title;
-           }
-           if (desc) {
-               updatedProduct.description = desc;
-           }
-           if (price) {
-               updatedProduct.price = price;
-           }
-           updatedProduct.save();
-       }
+        results = results.filter(i => i !== null);
+        const uniqueArray = getUniqueArray(results);
+        for (let j = 0; j < uniqueArray.length; j++) {
+            let flag = false;
+            const {multiplier} = results[j] || {};
+            ({ points, flag } = this.getsPoints(pointsDto, uniqueArray, j, points, multiplier, flag));
+            if (!flag) {
+                break;
+            }
+        }
+        return points
 
-       async deleteProduct(prodId: string) {
-           const result = await this.transactionsModel.deleteOne({_id: prodId}).exec();
-           if (result.n === 0) {
-               throw new NotFoundException('Could not find product.');
-           }
-       }
+    }
 
-       */
+    private getsPoints(pointsDto: any, uniqueArray: PointsDto[], j: number, points: number, multiplier: any, flag: boolean) {
+        pointsDto.forEach(pointsObj => {
+            const { quantity, retailPrice, brandId, tierId } = pointsObj || {};
+            if (uniqueArray[j].brandId === brandId && uniqueArray[j].tierId === tierId) {
+                points += Math.floor(multiplier * quantity * retailPrice);
+                flag = true;
+            }
+        });
+        return { points, flag };
+    }
 
      async getAll(): Promise<look_up_points> {
         let data;

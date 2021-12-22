@@ -34,8 +34,7 @@ export class ResellerController {
         @Req() req: Request,
         @Res() res: Response
     ) {
-        console.log("re",req.body.data);
-
+        
         try {
             if (!req.body.data.resellerInfo){
                  return res.status(404).send(   {message: 'Transaction not created since order has no reseller'});

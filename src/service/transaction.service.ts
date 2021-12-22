@@ -8,71 +8,48 @@ import {Transactions} from '../model/transaction.model';
 export class TransactionService {
     constructor(@InjectModel('transactions') private readonly transactionsModel: Model<Transactions>) {}
 
-    /*  async insertProduct(title: string, desc: string, price: number) {
-          const transactionsModel = new this.transactionsModel({
-              title,
-              description: desc,
-              price,
-          });
-          const result = await transactionsModel.save();
-          return result.id as string;
-      }*/
+    async getLoyaltyTransaction(req,res,resellerId){
+        try {
+            let { skip, pagelimit, sType }: { skip: number; pagelimit: any; sType: number; } = this.validateRequest(req);
+            let response =  await this.getPageResult(resellerId,skip,pagelimit,sType);
+            if (response) {
+                let total = await this.getCount(resellerId);
+                let meta = {
+                    hasNext: response.length * skip > total,
+                    length: response.length,
+                    total
+                }
+               return  res.status(200).json({data: response, meta});
+            } else{
+                return res.status(500).json({"msg":"error"});
+            }
 
-    async getTransactions() {
-        const transactions = await this.transactionsModel.find().exec();
-        return JSON.stringify(transactions)
+        } catch (e) {
+            return res.status(500).json(e);
+        }
+
+    }
+    private validateRequest(req: any) {
+        let offset = req.query.page;
+        let pagesize: any = req.query.pageSize;
+        let sort = req.query.sort;
+        let sType = 1;
+        if (sort == "DESC") {
+            sType = -1;
+        }
+        const pageOptions = {
+            page: offset || 0,
+            limit: parseInt(pagesize, 10) || 25
+        };
+        let pageFinal: any = pageOptions.page;
+        let pagelimit: any = pageOptions.limit;
+        let skip = pageFinal > 0 ? ((pageFinal - 1) * pageOptions.limit) : 0;
+        return { skip, pagelimit, sType };
     }
 
-  /* async getSingleProduct(productId: string) {
-         const product = await this.findProduct(productId);
-         return {
-             id: product.id,
-             title: product.title,
-             description: product.description,
-             price: product.price,
-         };
-     }*/
-
-  /*   async updateProduct(
-         productId: string,
-         title: string,
-         desc: string,
-         price: number,
-     ) {
-         const updatedProduct = await this.findProduct(productId);
-         if (title) {
-             updatedProduct.title = title;
-         }
-         if (desc) {
-             updatedProduct.description = desc;
-         }
-         if (price) {
-             updatedProduct.price = price;
-         }
-         updatedProduct.save();
-     }
-
-     async deleteProduct(prodId: string) {
-         const result = await this.transactionsModel.deleteOne({_id: prodId}).exec();
-         if (result.n === 0) {
-             throw new NotFoundException('Could not find product.');
-         }
-     }
-
-     */
-
-    private async findProduct(id: string): Promise<Transactions> {
-         let product;
-         try {
-             product = await this.transactionsModel.findById(id).exec();
-         } catch (error) {
-             throw new NotFoundException('Could not find product.');
-         }
-         if (!product) {
-             throw new NotFoundException('Could not find product.');
-         }
-         return product;
-     }
+    private async getCount(resellerId:string) {
+        return this.countResult(resellerId)
+    }
     async findOneAndUpdate(resellerId: string,orderId: string,transaction:any): Promise<any> {
         let product:any;
         console.log("in transacrtiona",transaction);

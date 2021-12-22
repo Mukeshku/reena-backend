@@ -36,40 +36,6 @@ export class PointGeneratorController {
         @Req() request: Request,
         @Res() response: Response
     ) {
-        let res: PointsDtoRes
-        try {
-            let points = 0;
-            let promises = [];
-            pointsDto.forEach(item => {
-                promises.push(this.lookupService.findProductBrandAndTierId(item.brandId, item.tierId));
-            });
-            Promise.all(promises).then(results => {
-                results = results.filter(i => i !== null);
-                const uniqueArray = getUniqueArray(results);
-
-                for (let j = 0; j < uniqueArray.length; j++) {
-                    let flag = false;
-                    const {multiplier} = results[j] || {};
-
-                    pointsDto.forEach(pointsObj => {
-                        const {quantity, retailPrice, brandId, tierId} = pointsObj || {}
-                        if (uniqueArray[j].brandId === brandId && uniqueArray[j].tierId === tierId) {
-                            points += Math.floor(multiplier * quantity * retailPrice);
-                            flag = true;
-                        }
-                    })
-
-                    if (!flag) {
-                        break;
-                    }
-                }
-                res = {"pointsGenerated": Math.floor(parseFloat(points.toFixed(2)))}
-                return response.status(200).send({pointsGenerated: Math.floor(parseFloat(points.toFixed(2)))});
-            }).catch(e => {
-                return response.status(500).send({msg: AppConstants.GENERIC_ERROR_MESSAGE + e});
-            });
-        } catch (e) {
-            return response.status(500).send({msg: AppConstants.GENERIC_ERROR_MESSAGE + e});
-        }
+       return this.lookupService.calculatePoint(request,response,pointsDto)
     }
 }

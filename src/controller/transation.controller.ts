@@ -15,11 +15,4 @@ import {TransactionService} from '../service/transaction.service';
 export class TransationController {
 
     constructor(private readonly transactionService: TransactionService) {}
-
-
-    @Get('/lookup')
-    async getAllProducts() {
-        const transactions = await this.transactionService.getTransactions();
-        return transactions;
-    }
 }
