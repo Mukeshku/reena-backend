@@ -7,7 +7,7 @@ import {ApiBody} from "@nestjs/swagger";
 import {WebhooksAPIDTO} from "../model/Dto/WebhooksAPIDTO";
 import {EndPoints} from '../common/constants/endPoints'
 import {PayloadConstants} from '../common/constants/PayloadConstants'
-import { resellers } from 'src/model/reseller.model';
+import {resellers} from 'src/model/reseller.model';
 
 
 @Controller(EndPoints.WEBHOOKS)
@@ -17,11 +17,13 @@ export class ResellerController {
         private readonly resellerService: ResellerService,
         private readonly transactionService: TransactionService,
         private readonly lookUpService: LookUpService
-        ) {}
+    ) {
+    }
 
     @Post()
     @ApiBody(
-        {type: WebhooksAPIDTO,
+        {
+            type: WebhooksAPIDTO,
             description: "The Description for the Post Body. Please look into the DTO for more info.",
             examples: {
                 a: {
@@ -29,38 +31,39 @@ export class ResellerController {
                     description: "Edit the body with actual data",
                     value: PayloadConstants.WEBHOOKS_API_SAMPLE_PAYLOAD as WebhooksAPIDTO
                 }
-            }}
+            }
+        }
     )
     async webhooks(
         @Req() req: Request,
         @Res() res: Response
     ) {
-        
+
         try {
-            if (!req.body.data.resellerInfo){
-                 return res.status(404).send({message: 'Transaction not created since order has no reseller'});
+            if (!req.body.data.resellerInfo) {
+                return res.status(404).send({message: 'Transaction not created since order has no reseller'});
             }
-            const { resellerId, orderId, tierId, type, currency, entityType } = getRequestProperties(req);
-            if (! await this.transactionService.countDocuments(resellerId,orderId)) {
-                let reseller :any
-                try{
+            const {resellerId, orderId, tierId, type, currency, entityType} = getRequestProperties(req);
+            if (!await this.transactionService.countDocuments(resellerId, orderId)) {
+                let reseller: any
+                try {
                     reseller = await this.resellerService.findProductResellerAndTierId(resellerId, tierId);
-                }catch(e){
+                } catch (e) {
                     return res.status(404).send({message: e});
                 }
-                let transaction:any
+                let transaction: any
                 transaction = getTransactionModel(type, reseller, tierId, req, orderId, currency, entityType)
                 let points = [];
                 req.body.data.items.forEach((item) => {
-                    points.push(getProductPoints(item, tierId,this.lookUpService));
+                    points.push(getProductPoints(item, tierId, this.lookUpService));
                 });
                 const tempItems = await Promise.all(points);
                 transaction = updateTransactionWithPoints(transaction, tempItems);
-                if (transaction.points <= 0){
-                 return res.status(200).send({message: 'Transaction not created since order generated 0 points'});
+                if (transaction.points <= 0) {
+                    return res.status(200).send({message: 'Transaction not created since order generated 0 points'});
                 }
-                this.transactionService.findOneAndUpdate(resellerId,orderId,transaction).then(data => {
-                    this.resellerService.updateOne(resellerId,reseller.points +  transaction.points).then(id => {
+                this.transactionService.findOneAndUpdate(resellerId, orderId, transaction).then(data => {
+                    this.resellerService.updateOne(resellerId, reseller.points + transaction.points).then(id => {
                         return res.status(200).send({message: 'Transaction Successfully Saved', data: data});
                     })
                 });
@@ -93,7 +96,7 @@ function getRequestProperties(req) {
     const currency = req.body.data.currency || '';
     const entityType = req.body.data.entityType || '';
     const type = req.body.type || '';
-    return { resellerId, orderId, tierId, type, currency, entityType };
+    return {resellerId, orderId, tierId, type, currency, entityType};
 }
 
 function getTransactionModel(type: any, reseller: resellers, tierId: any, req, orderId: any, currency: any, entityType: any): any {
@@ -114,7 +117,7 @@ function getTransactionModel(type: any, reseller: resellers, tierId: any, req, o
     };
 }
 
-function getProductPoints(item, tierId,lookupService) {
+function getProductPoints(item, tierId, lookupService) {
     return new Promise((resolve, reject) => {
         lookupService.findOne(item.brandId, tierId).then((data, error) => {
             if (error) reject(error);

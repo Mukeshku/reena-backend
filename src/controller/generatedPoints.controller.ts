@@ -1,12 +1,11 @@
-import {Body, Controller, ParseArrayPipe, Post, Req, Res,} from '@nestjs/common';
+import {Body, Controller, ParseArrayPipe, Post, Res,} from '@nestjs/common';
 
 import {LookUpService} from '../service/lookup.service';
 import {PointsDto} from '../model/Dto/PointsDto'
-import {Request, Response} from 'express';
+import {Response} from 'express';
 import {ApiBody} from "@nestjs/swagger";
 import {CalulatePointsGenratedDTO} from "../model/Dto/CalulatePointsGenratedDTO";
 import {EndPoints} from '../common/constants/EndPoints'
-import {AppConstants} from '../common/constants/AppConstants'
 import {PayloadConstants} from '../common/constants/PayloadConstants'
 
 
@@ -16,10 +15,10 @@ export class PointGeneratorController {
     constructor(private readonly lookupService: LookUpService) {
     }
 
-
     @Post()
     @ApiBody(
-        {type: CalulatePointsGenratedDTO,
+        {
+            type: CalulatePointsGenratedDTO,
             description: "The Description for the Post Body. Please look into the DTO for more info.",
             examples: {
                 a: {
@@ -27,13 +26,14 @@ export class PointGeneratorController {
                     description: "Edit the body with actual data",
                     value: PayloadConstants.CALCULATED_GENERATED_POINTS_DTO_SAMPLE_PAYLOAD as [CalulatePointsGenratedDTO, CalulatePointsGenratedDTO]
                 }
-            }}
+            }
+        }
     )
     async calculatePoints(
         @Body(new ParseArrayPipe({items: PointsDto})) pointsDto: PointsDto[],
         @Res() response: Response
     ) {
-        return await this.lookupService.calculatePoint(pointsDto,response)
-           
+        return await this.lookupService.calculatePoint(pointsDto, response)
+
     }
 }
