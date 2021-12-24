@@ -2,7 +2,6 @@ import {Controller, Get, Param, Req, Res} from '@nestjs/common';
 import {Request, Response} from 'express';
 import {ResellerService} from '../service/reseller.service';
 import {ApiParam} from "@nestjs/swagger";
-import {EndPoints} from '../common/constants/EndPoints'
 import {TransactionService} from "../service/transaction.service";
 
 

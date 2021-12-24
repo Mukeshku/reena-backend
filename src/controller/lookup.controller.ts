@@ -3,7 +3,6 @@ import {Body, Controller, Get, Post, Res,} from '@nestjs/common';
 import {LookUpService} from '../service/lookup.service';
 import {ApiBody} from "@nestjs/swagger";
 import {LookUpControllerBodyDTO} from "../model/Dto/LookUpControllerBodyDTO";
-import {EndPoints} from '../common/constants/EndPoints'
 import {PayloadConstants} from '../common/constants/PayloadConstants'
 import {Response} from 'express';
 
