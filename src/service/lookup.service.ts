@@ -7,13 +7,14 @@ import {PointsDtoRes} from 'src/model/Dto/PointsDtoResponse';
 import {getUniqueArray} from "../common/utils/generatedpointsUtils";
 import {AppConstants} from '../common/constants/AppConstants'
 import {PointsDto} from '../model/Dto/PointsDto'
+import { ErrorConstants } from 'src/common/constants/errorConstants';
 
 @Injectable()
 export class LookUpService {
     constructor(@InjectModel('look_up_points') private readonly lookUpModel: Model<look_up_points>) {
     }
 
-    async calculatePoint(request,response,pointsDto){
+    async calculatePoint(pointsDto){
         let res: PointsDtoRes
         try {
             let points = 0;
@@ -24,12 +25,12 @@ export class LookUpService {
             Promise.all(promises).then(results => {
                 points = this.getPointsWrapper(results,pointsDto,points)
                 res = {"pointsGenerated": Math.floor(parseFloat(points.toFixed(2)))}
-                return response.status(200).send({pointsGenerated: Math.floor(parseFloat(points.toFixed(2)))});
+                return res
             }).catch(e => {
-                return response.status(500).send({msg: AppConstants.GENERIC_ERROR_MESSAGE + e});
+                throw e
             });
         } catch (e) {
-            return response.status(500).send({msg: AppConstants.GENERIC_ERROR_MESSAGE + e});
+           throw e
         }
     }
 
@@ -46,7 +47,6 @@ export class LookUpService {
             }
         }
         return points
-
     }
 
     private getsPoints(pointsDto: any, uniqueArray: PointsDto[], j: number, points: number, multiplier: any, flag: boolean) {
@@ -65,20 +65,10 @@ export class LookUpService {
         try {
             data = await this.lookUpModel.find({})
         } catch (error) {
-            throw new NotFoundException('Could not find product.');
+            throw new NotFoundException(ErrorConstants.ERROR,ErrorConstants.ERROR_MESSAGE_SOMETING_WENT_WRONG);
         }
         if (!data) {
-            throw new NotFoundException('Could not find product.');
-        }
-        return data;
-    }
-    async findOne(brandId: string,tierId: string): Promise<look_up_points> {
-        console.log("items");
-        let data:look_up_points;
-        try {
-            data = await this.lookUpModel.findOne({brandId,tierId})
-        } catch (error) {
-            throw new NotFoundException('Could not find product.');
+            throw new NotFoundException(ErrorConstants.ERROR,ErrorConstants.ERROR_RESELLER_NOT_FOUND);
         }
         return data;
     }
@@ -90,10 +80,10 @@ export class LookUpService {
                 {},
                 {upsert: true, new: true});
         } catch (e) {
-            throw new NotFoundException('Could not find product.');
+            throw new NotFoundException(ErrorConstants.ERROR,ErrorConstants.ERROR_MESSAGE_SOMETING_WENT_WRONG);
         }
         if (!product) {
-            throw new NotFoundException('Could not find product.');
+            throw new NotFoundException(ErrorConstants.ERROR,ErrorConstants.ERROR_RESELLER_NOT_FOUND);
         }
         return product._id;
     }
@@ -103,12 +93,11 @@ export class LookUpService {
             product = await this.lookUpModel.findOne(
                 {tierId, brandId});
         } catch (e) {
-            throw new NotFoundException('Could not find product.');
+            throw new NotFoundException(ErrorConstants.ERROR,ErrorConstants.ERROR_MESSAGE_SOMETING_WENT_WRONG);
         }
         if (!product) {
-            throw new NotFoundException('Could not find product.');
+            throw new NotFoundException(ErrorConstants.ERROR,ErrorConstants.ERROR_BRAND_NOT_FOUND+" "+brandId);
         }
-        console.log(product)
         return product;
     }
 }

@@ -2,12 +2,10 @@ import {Body, Controller, ParseArrayPipe, Post, Req, Res,} from '@nestjs/common'
 
 import {LookUpService} from '../service/lookup.service';
 import {PointsDto} from '../model/Dto/PointsDto'
-import {PointsDtoRes} from 'src/model/Dto/PointsDtoResponse';
 import {Request, Response} from 'express';
-import {getUniqueArray} from "../common/utils/generatedpointsUtils";
 import {ApiBody} from "@nestjs/swagger";
 import {CalulatePointsGenratedDTO} from "../model/Dto/CalulatePointsGenratedDTO";
-import {EndPoints} from '../common/constants/endPoints'
+import {EndPoints} from '../common/constants/EndPoints'
 import {AppConstants} from '../common/constants/AppConstants'
 import {PayloadConstants} from '../common/constants/PayloadConstants'
 
@@ -33,9 +31,14 @@ export class PointGeneratorController {
     )
     async calculatePoints(
         @Body(new ParseArrayPipe({items: PointsDto})) pointsDto: PointsDto[],
-        @Req() request: Request,
         @Res() response: Response
     ) {
-       return this.lookupService.calculatePoint(request,response,pointsDto)
+        try{
+        let res = this.lookupService.calculatePoint(pointsDto)
+        return  response.status(200).json(res);
+        }catch(e){
+            const {message,error,statusCode} =  e?.response || {}
+            return response.status(statusCode).json({"message":message,"error":error});
+        }
     }
 }

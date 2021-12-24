@@ -1,6 +1,7 @@
 import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
+import { ErrorConstants } from 'src/common/constants/errorConstants';
 
 import {resellers} from '../model/reseller.model';
 
@@ -9,33 +10,20 @@ export class ResellerService {
     constructor(@InjectModel('resellers') private readonly resellerModel: Model<resellers>) {
     }
 
-     async getSummary(resellerId,req,res){
-        try {
-            console.log('Reseller id from URL is  ', resellerId , req.query);
-            let resellerData: resellers = await this.findItemFromResellerId(resellerId);
-            console.log('DATA from DB is ', resellerData);
-            if (resellerData) {
-                return res.status(200).send(resellerData);
-            } else {
-                return res.status(500).send({error: 'No reseller found'});
-            }
-        } catch (e) {
-            return res.status(500).send({error: 'something went wrong'});
-        }
-
+     async getSummary(resellerId){
+        return await this.findItemFromResellerId(resellerId);
      }
 
     async findProductResellerAndTierId(resellerId: string,tierId: string): Promise<resellers> {
-        console.log("reseller",resellerId,tierId);
         let product: resellers;
         try {
             product = await this.resellerModel.findOneAndUpdate(
                 {tierId, resellerId},{upsert: true, new: true});
         } catch (e) {
-            throw new NotFoundException('Could not find reseller.');
+            throw new NotFoundException(ErrorConstants.ERROR, ErrorConstants.ERROR_MESSAGE_SOMETING_WENT_WRONG)
         }
         if (!product) {
-            throw new NotFoundException('Could not find reseller.');
+            throw new NotFoundException(ErrorConstants.ERROR, ErrorConstants.ERROR_RESELLER_NOT_FOUND+" resellerId "+ resellerId)
         }
         console.log(product)
         return product;
@@ -49,10 +37,10 @@ export class ResellerService {
                     $set: {"points": totalPoints},
                 })
         } catch (e) {
-            throw new NotFoundException('Could not find reseller.');
+            throw new NotFoundException(ErrorConstants.ERROR, ErrorConstants.ERROR_MESSAGE_SOMETING_WENT_WRONG)
         }
         if (!product) {
-            throw new NotFoundException('Could not find reseller.');
+            throw new NotFoundException(ErrorConstants.ERROR, ErrorConstants.ERROR_RESELLER_NOT_FOUND+" resellerId "+ resellerId)
         }
         console.log(product)
         return product;
@@ -65,7 +53,10 @@ export class ResellerService {
                 {resellerId},
                 {_id: 1, points: 1, resellerId: 1, tierId: 1}) // Projection is required to filter DATA.
         } catch (error) {
-            throw new NotFoundException('Could not find product.');
+            throw new NotFoundException(ErrorConstants.ERROR,ErrorConstants.ERROR_MESSAGE_SOMETING_WENT_WRONG);
+        }
+        if(!product){
+            throw new NotFoundException(ErrorConstants.ERROR,ErrorConstants.ERROR_RESELLER_NOT_FOUND);
         }
         return product;
     }

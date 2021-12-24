@@ -1,6 +1,8 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
+import {HttpException, HttpStatus, Injectable, NotFoundException} from '@nestjs/common';
+import { BaseExceptionFilter } from '@nestjs/core';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
+import { ErrorConstants } from 'src/common/constants/errorConstants';
 
 import {Transactions} from '../model/transaction.model';
 
@@ -8,26 +10,20 @@ import {Transactions} from '../model/transaction.model';
 export class TransactionService {
     constructor(@InjectModel('transactions') private readonly transactionsModel: Model<Transactions>) {}
 
-    async getLoyaltyTransaction(req,res,resellerId){
+    async getLoyaltyTransaction(req,resellerId){
         try {
             let { skip, pagelimit, sType }: { skip: number; pagelimit: any; sType: number; } = this.validateRequest(req);
             let response =  await this.getPageResult(resellerId,skip,pagelimit,sType);
-            if (response) {
-                let total = await this.getCount(resellerId);
-                let meta = {
-                    hasNext: response.length * skip > total,
-                    length: response.length,
-                    total
-                }
-               return  res.status(200).json({data: response, meta});
-            } else{
-                return res.status(500).json({"msg":"error"});
+            let total = await this.getCount(resellerId);
+            let meta = {
+                hasNext: response.length * skip > total,
+                length: response.length,
+                total
             }
-
+            return {data: response, meta}     
         } catch (e) {
-            return res.status(500).json(e);
+            throw e
         }
-
     }
     private validateRequest(req: any) {
         let offset = req.query.page;
@@ -52,18 +48,14 @@ export class TransactionService {
     }
     async findOneAndUpdate(resellerId: string,orderId: string,transaction:any): Promise<any> {
         let product:any;
-        console.log("in transacrtiona",transaction);
         try {
             product = await this.transactionsModel.findOneAndUpdate({
                 resellerId,
                 'data.id': orderId,
             }, transaction, {upsert: true, new: true}).exec();
         } catch (error) {
-            console.log("error in transacrtiona",error);
-            throw new NotFoundException('Could not find product.');
+            throw new NotFoundException(ErrorConstants.ERROR, ErrorConstants.ERROR_RESELLER_NOT_FOUND+' resellerId '+resellerId+' orderId '+orderId);
         }
-        console.log("in transacrtiona");
-
         return product;
     }
     async countDocuments(resellerId: string,orderId:string): Promise<any> {
@@ -72,20 +64,18 @@ export class TransactionService {
         try {
             count = await this.transactionsModel.count({"resellerId":resellerId, 'data.id': orderId}).exec();
         } catch (error) {
-            throw new NotFoundException('Could not find document.');
+            throw new NotFoundException(ErrorConstants.ERROR, ErrorConstants.ERROR_MESSAGE_SOMETING_WENT_WRONG)
         }
         console.log(count);
         return count;
     }
     async countResult(resellerId: string): Promise<any> {
-        console.log("transaction",resellerId);
         let count = 0;
         try {
             count = await this.transactionsModel.count({"resellerId":resellerId}).exec();
         } catch (error) {
-            throw new NotFoundException('Could not find document.');
+            throw new NotFoundException(ErrorConstants.ERROR, ErrorConstants.ERROR_MESSAGE_SOMETING_WENT_WRONG)
         }
-        console.log(count);
         return count;
     }
     async getPageResult(resellerId: string, skip: number, limit: number,sType:any): Promise<any> {
@@ -94,7 +84,10 @@ export class TransactionService {
             product = await this.transactionsModel.find({resellerId},{}).skip(skip).limit(limit)
             .sort({createdAt: sType}).exec();
         } catch (error) {
-            throw new NotFoundException('Could not find product.');
+            throw new NotFoundException(ErrorConstants.ERROR, ErrorConstants.ERROR_MESSAGE_SOMETING_WENT_WRONG)
+        }
+        if (!product || product.length == 0){
+            throw new NotFoundException(ErrorConstants.ERROR, ErrorConstants.ERROR_RESELLER_NOT_FOUND+' resellerId '+resellerId);
         }
         return product;
     }

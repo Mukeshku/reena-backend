@@ -1,10 +1,11 @@
-import {Controller, Get, Param, Req, Res} from '@nestjs/common';
+import {Controller, Get, Param, Req, Res, UsePipes, ValidationPipe} from '@nestjs/common';
 import {Request, Response} from 'express';
 import {ResellerService} from '../service/reseller.service';
 import {resellers} from "../model/reseller.model";
 import {TransactionService} from 'src/service/transaction.service';
 import {ApiParam} from "@nestjs/swagger";
-import {EndPoints} from '../common/constants/endPoints'
+import {EndPoints} from '../common/constants/EndPoints'
+
 
 
 @Controller(EndPoints.RESELLERS)
@@ -22,7 +23,13 @@ export class SummaryController {
         schema: { oneOf: [{type: 'string'}]}
     })
     async summary(@Req() req: Request, @Res() res: Response, @Param('resellerId') resellerId) {
-      return this.resellerService.getSummary(resellerId,res,req)
+        try {
+            let resellerData = this.resellerService.getSummary(resellerId)
+            return res.status(200).send(resellerData);
+        } catch (e) {
+            const {message,error,statusCode} =  e?.response || {}
+            return res.status(statusCode).json({"message":message,"error":error});
+        }
     }
 
 
@@ -35,11 +42,16 @@ export class SummaryController {
     async loyaltyTransactions(
         @Req() req: Request,
         @Res() res: Response,
-        @Param('resellerId') resellerId
+        @Param('resellerId') resellerId ,
     ) {
-       return this.transactionService.getLoyaltyTransaction(req,res,resellerId)
+        try{
+            let result = this.transactionService.getLoyaltyTransaction(req,resellerId)
+            return  res.status(200).json(result);
+        }catch(e){
+            const {message,error,statusCode} =  e?.response || {}
+            return res.status(statusCode).json({"message":message,"error":error});
+
+        }
     }
 }
-async function getCount(resellerId:string,transactionService) {
-    return transactionService.countResult(resellerId)
-}
+

@@ -1,10 +1,11 @@
-import {Body, Controller, Get, Post,} from '@nestjs/common';
+import {Body, Catch, Controller, Get, Post, Req, Res,} from '@nestjs/common';
 
 import {LookUpService} from '../service/lookup.service';
 import {ApiBody} from "@nestjs/swagger";
 import {LookUpControllerBodyDTO} from "../model/Dto/LookUpControllerBodyDTO";
-import {EndPoints} from '../common/constants/endPoints'
+import {EndPoints} from '../common/constants/EndPoints'
 import {PayloadConstants} from '../common/constants/PayloadConstants'
+import {Request, Response} from 'express';
 
 
 @Controller(EndPoints.LOOKUP)
@@ -27,14 +28,25 @@ export class LookupController {
     async lookup(
         @Body('tierId') tierId: string,
         @Body('brandId') brandId: string,
-        @Body('multiplier') multiplier: number
+        @Body('multiplier') multiplier: number,
+        @Res() response: Response
     ) {
-        const generatedId = await this.lookupService.findProductByData(tierId, brandId, multiplier);
-        return { id: generatedId };
+        try{
+            const generatedId = await this.lookupService.findProductByData(tierId, brandId, multiplier);
+            return { id: generatedId };
+        }catch(e){
+            const {message,error,statusCode} =  e?.response || {}
+            return response.status(statusCode).json({"message":message,"error":error});
+        }
     }
 
     @Get()
-    async Lookup() {
-        return await this.lookupService.getAll();
+    async Lookup(@Res() response: Response) {
+        try{
+            return await this.lookupService.getAll();
+        }catch(e){
+            const {message,error,statusCode} =  e?.response || {}
+            return response.status(statusCode).json({"message":message,"error":error}); 
+        }
     }
 }
