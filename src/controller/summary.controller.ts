@@ -6,7 +6,7 @@ import {EndPoints} from '../common/constants/EndPoints'
 import {TransactionService} from "../service/transaction.service";
 
 
-@Controller(EndPoints.RESELLERS)
+@Controller('/api/resellers')
 export class SummaryController {
 
     constructor(
@@ -15,7 +15,7 @@ export class SummaryController {
     ) {
     }
 
-    @Get(EndPoints.SUMMARY)
+    @Get('/:resellerId/summary')
     @ApiParam({
         name: 'resellerId',
         required: true,
@@ -33,7 +33,7 @@ export class SummaryController {
     }
 
 
-    @Get(EndPoints.LOYALTY_TRANSACTIONS)
+    @Get('/:resellerId/loyaltyTransactions')
     @ApiParam({
         name: 'resellerId',
         required: true,

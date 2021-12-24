@@ -8,7 +8,7 @@ import {PayloadConstants} from '../common/constants/PayloadConstants'
 import {Response} from 'express';
 
 
-@Controller(EndPoints.LOOKUP)
+@Controller('/api/lookup')
 export class LookupController {
 
     constructor(private readonly lookupService: LookUpService) {
