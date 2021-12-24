@@ -5,11 +5,11 @@ import {PointsDto} from '../model/Dto/PointsDto'
 import {Response} from 'express';
 import {ApiBody} from "@nestjs/swagger";
 import {CalulatePointsGenratedDTO} from "../model/Dto/CalulatePointsGenratedDTO";
-import {EndPoints} from '../common/constants/EndPoints'
 import {PayloadConstants} from '../common/constants/PayloadConstants'
+import {EndPoints} from "../common/constants/endPoints";
 
 
-@Controller(EndPoints.CALCULATE_POINTS_GENERATED)
+@Controller('/api/calculate-points-generated')
 export class PointGeneratorController {
 
     constructor(private readonly lookupService: LookUpService) {
