@@ -1,13 +1,13 @@
 import {Controller, Post, Req, Res} from '@nestjs/common';
-import {LookUpService} from 'src/service/lookup.service';
-import {TransactionService} from 'src/service/transaction.service';
 import {Request, Response} from 'express';
 import {ResellerService} from '../service/reseller.service';
 import {ApiBody} from "@nestjs/swagger";
 import {WebhooksAPIDTO} from "../model/Dto/WebhooksAPIDTO";
 import {EndPoints} from '../common/constants/endPoints'
 import {PayloadConstants} from '../common/constants/PayloadConstants'
-import {resellers} from 'src/model/reseller.model';
+import {TransactionService} from "../service/transaction.service";
+import {LookUpService} from "../service/lookup.service";
+import {resellers} from "../model/reseller.model";
 
 
 @Controller(EndPoints.WEBHOOKS)

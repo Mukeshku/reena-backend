@@ -3,10 +3,10 @@ import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
 
 import {look_up_points} from '../model/lookup.model';
-import {PointsDtoRes} from 'src/model/Dto/PointsDtoResponse';
 import {getUniqueArray} from "../common/utils/generatedpointsUtils";
 import {PointsDto} from '../model/Dto/PointsDto'
-import {ErrorConstants} from 'src/common/constants/errorConstants';
+import {PointsDtoRes} from "../model/Dto/PointsDtoResponse";
+import {ErrorConstants} from "../common/constants/ErrorConstants";
 
 @Injectable()
 export class LookUpService {

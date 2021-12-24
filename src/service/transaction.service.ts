@@ -1,9 +1,9 @@
 import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectModel} from '@nestjs/mongoose';
 import {Model} from 'mongoose';
-import {ErrorConstants} from 'src/common/constants/errorConstants';
 
 import {Transactions} from '../model/transaction.model';
+import {ErrorConstants} from "../common/constants/ErrorConstants";
 
 @Injectable()
 export class TransactionService {

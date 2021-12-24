@@ -4,11 +4,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import {ResellerController} from '../controller/reseller.controller';
 import { ResellerService } from '../service/reseller.service';
 import { ResellerSchema } from '../model/reseller.model';
-import { LookUpService } from 'src/service/lookup.service';
-import { TransactionService } from 'src/service/transaction.service';
-import { LookUpSchema } from 'src/model/lookup.model';
-import { TransactionSchema } from 'src/model/transaction.model';
 import {SummaryController} from "../controller/summary.controller";
+import {LookUpSchema} from "../model/lookup.model";
+import {TransactionSchema} from "../model/transaction.model";
+import {LookUpService} from "../service/lookup.service";
+import {TransactionService} from "../service/transaction.service";
 
 @Module({
     imports: [MongooseModule.forFeature([
