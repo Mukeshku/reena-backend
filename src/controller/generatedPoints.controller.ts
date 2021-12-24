@@ -33,12 +33,7 @@ export class PointGeneratorController {
         @Body(new ParseArrayPipe({items: PointsDto})) pointsDto: PointsDto[],
         @Res() response: Response
     ) {
-        try{
-        let res = this.lookupService.calculatePoint(pointsDto)
-        return  response.status(200).json(res);
-        }catch(e){
-            const {message,error,statusCode} =  e?.response || {}
-            return response.status(statusCode).json({"message":message,"error":error});
-        }
+        return await this.lookupService.calculatePoint(pointsDto,response)
+           
     }
 }

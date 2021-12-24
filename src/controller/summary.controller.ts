@@ -24,7 +24,7 @@ export class SummaryController {
     })
     async summary(@Req() req: Request, @Res() res: Response, @Param('resellerId') resellerId) {
         try {
-            let resellerData = this.resellerService.getSummary(resellerId)
+            let resellerData =await this.resellerService.getSummary(resellerId)
             return res.status(200).send(resellerData);
         } catch (e) {
             const {message,error,statusCode} =  e?.response || {}
@@ -45,7 +45,7 @@ export class SummaryController {
         @Param('resellerId') resellerId ,
     ) {
         try{
-            let result = this.transactionService.getLoyaltyTransaction(req,resellerId)
+            let result =await this.transactionService.getLoyaltyTransaction(req,resellerId)
             return  res.status(200).json(result);
         }catch(e){
             const {message,error,statusCode} =  e?.response || {}

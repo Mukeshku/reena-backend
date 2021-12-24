@@ -14,7 +14,7 @@ export class LookUpService {
     constructor(@InjectModel('look_up_points') private readonly lookUpModel: Model<look_up_points>) {
     }
 
-    async calculatePoint(pointsDto){
+    async calculatePoint(pointsDto,response){
         let res: PointsDtoRes
         try {
             let points = 0;
@@ -25,12 +25,14 @@ export class LookUpService {
             Promise.all(promises).then(results => {
                 points = this.getPointsWrapper(results,pointsDto,points)
                 res = {"pointsGenerated": Math.floor(parseFloat(points.toFixed(2)))}
-                return res
+                return response.status(200).json(res);
             }).catch(e => {
-                throw e
+                const {message,error,statusCode} =  e?.response || {}
+                return response.status(statusCode).json({"message":message,"error":error});
             });
         } catch (e) {
-           throw e
+            const {message,error,statusCode} =  e?.response || {}
+            return response.status(statusCode).json({"message":message,"error":error});
         }
     }
 

@@ -33,7 +33,7 @@ export class LookupController {
     ) {
         try{
             const generatedId = await this.lookupService.findProductByData(tierId, brandId, multiplier);
-            return { id: generatedId };
+            return response.status(200).json({ id: generatedId });
         }catch(e){
             const {message,error,statusCode} =  e?.response || {}
             return response.status(statusCode).json({"message":message,"error":error});
@@ -43,7 +43,8 @@ export class LookupController {
     @Get()
     async Lookup(@Res() response: Response) {
         try{
-            return await this.lookupService.getAll();
+            let res  = await this.lookupService.getAll();
+            return response.status(200).json(res);
         }catch(e){
             const {message,error,statusCode} =  e?.response || {}
             return response.status(statusCode).json({"message":message,"error":error}); 
