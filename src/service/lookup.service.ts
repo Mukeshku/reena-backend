@@ -98,9 +98,6 @@ export class LookUpService {
         } catch (e) {
             throw new NotFoundException(ErrorConstants.ERROR, ErrorConstants.ERROR_MESSAGE_SOMETING_WENT_WRONG);
         }
-        if (!product) {
-            throw new NotFoundException(ErrorConstants.ERROR, ErrorConstants.ERROR_BRAND_NOT_FOUND + " " + brandId);
-        }
         return product;
     }
 }
