@@ -17,7 +17,7 @@ dotenv.config()
       LookupModule,
       ResellerModule,
       DeviceModule,
-      ScheduleModule.forRoot(),
+      ScheduleModule.forRoot(), // https://docs.nestjs.com/techniques/task-scheduling
       MongooseModule.forRoot(process.env.PROD_MONGO_URI)
   ],
   controllers: [AppController],
