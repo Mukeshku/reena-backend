@@ -6,6 +6,8 @@ import {TransactionModule} from "./modules/transaction.module";
 import {LookupModule} from "./modules/lookup.module";
 import {ResellerModule} from './modules/reseller.module';
 import {LoggerMiddleware} from "./middleware/logger.middleware";
+import { DeviceModule } from './device/device.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 const dotenv = require('dotenv');
 dotenv.config()
@@ -14,6 +16,8 @@ dotenv.config()
       TransactionModule,
       LookupModule,
       ResellerModule,
+      DeviceModule,
+      ScheduleModule.forRoot(),
       MongooseModule.forRoot(process.env.PROD_MONGO_URI)
   ],
   controllers: [AppController],
